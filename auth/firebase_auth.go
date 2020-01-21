@@ -65,6 +65,7 @@ type GetFirebaseUserSchema struct {
 	UID   *string
 	Email *string
 	Phone *string
+	Token *string
 }
 
 func (b *FireAuthImpl) GetFirebaseUser(schema GetFirebaseUserSchema) *FirebaseUserInfo {
@@ -76,6 +77,10 @@ func (b *FireAuthImpl) GetFirebaseUser(schema GetFirebaseUserSchema) *FirebaseUs
 		u, err = b.FirebaseAuth.GetUserByEmail(context.Background(), *schema.Email)
 	} else if schema.Phone != nil {
 		u, err = b.FirebaseAuth.GetUserByPhoneNumber(context.Background(), *schema.Phone)
+	}else if schema.Token != nil {
+		var token *auth.Token
+		token, err = b.FirebaseAuth.VerifyIDToken(context.Background(), *schema.Token)
+		u, err = b.FirebaseAuth.GetUser(context.Background(), token.UID)
 	}
 
 	if err != nil {
